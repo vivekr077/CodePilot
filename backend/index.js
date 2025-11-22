@@ -2,6 +2,8 @@ import express from 'express'
 import dotenv from 'dotenv'
 import { prisma } from './lib/prisma.js';
 import userRoute from './route/userRoute.js';
+import cookieParser from 'cookie-parser';
+import codeRoute from './route/codeGeneratorRoute.js';
 
 dotenv.config();
 
@@ -20,7 +22,10 @@ const setupAndStartServer = async() => {
       
       app.use(express.json());
       app.use(express.urlencoded());
+      app.use(cookieParser());
+
       app.use('/api/v1', userRoute);
+      app.use('/api/v1', codeRoute);
 }
 
 setupAndStartServer();

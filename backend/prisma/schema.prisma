@@ -32,7 +32,7 @@ model Generation {
   id         Int      @id @default(autoincrement())
   prompt     String
   language   Language  // "javascript", "python", "cpp", "java"
-  code       String
+  code       String    @db.LongText
   timestamp  DateTime @default(now())
 
   // Foreign key → relates to Users table
