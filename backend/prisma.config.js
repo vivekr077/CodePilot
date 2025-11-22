@@ -10,5 +10,10 @@ export default defineConfig({
   },
   datasource: {
     url: env("DATABASE_URL"),
+    pool: {
+      max: 15, // Increase max connections
+      min: 1,
+      acquireTimeoutMillis: 20000 // Increase timeout to 20s
+    }
   },
 });
