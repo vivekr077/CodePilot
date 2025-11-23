@@ -15,6 +15,7 @@ import {
   ArrowLeft,
   Loader
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -23,7 +24,6 @@ const HistoryPage = () => {
   const { logout } = useAuth();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -37,7 +37,6 @@ const HistoryPage = () => {
 
   const fetchHistory = async (page) => {
     setLoading(true);
-    setError('');
 
     try {
       const response = await api.get(`/history?page=${page}&limit=${itemsPerPage}`);
@@ -47,10 +46,10 @@ const HistoryPage = () => {
         setTotalPages(response.data.totalPages);
         setTotalCount(response.data.totalCount);
       } else {
-        setError('Failed to fetch history');
+        toast.error('Failed to fetch history');
       }
     } catch (err) {
-      setError(err.response?.data?.msg || 'An error occurred while fetching history');
+      toast.error(err.response?.data?.msg || 'An error occurred while fetching history');
     } finally {
       setLoading(false);
     }
@@ -60,9 +59,10 @@ const HistoryPage = () => {
     try {
       await navigator.clipboard.writeText(code);
       setCopiedId(id);
+      toast.success('Code copied to clipboard!');
       setTimeout(() => setCopiedId(null), 2000);
     } catch (err) {
-      console.error('Failed to copy:', err);
+      toast.error('Failed to copy code');
     }
   };
 
@@ -142,13 +142,6 @@ const HistoryPage = () => {
           <div className="loading-state">
             <Loader className="spin" size={48} />
             <p>Loading your history...</p>
-          </div>
-        ) : error ? (
-          <div className="error-state">
-            <p>{error}</p>
-            <button className="btn btn-primary" onClick={() => fetchHistory(currentPage)}>
-              Try Again
-            </button>
           </div>
         ) : history.length === 0 ? (
           <div className="empty-state">

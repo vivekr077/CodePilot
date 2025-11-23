@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserPlus, Mail, Lock, User, ArrowRight, Code2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 
 const SignupPage = () => {
   const navigate = useNavigate();
-  const { signup } = useAuth();
+  const { signup, user } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -14,7 +15,13 @@ const SignupPage = () => {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user?.isAuthenticated) {
+      navigate('/generator');
+    }
+  }, [user, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -57,15 +64,14 @@ const SignupPage = () => {
 
     if (Object.keys(newErrors).length === 0) {
       setLoading(true);
-      setMessage('');
       
       const result = await signup(formData.name, formData.email, formData.password);
       
       if (result.success) {
-        setMessage('Account created successfully! Redirecting to login...');
+        toast.success('Account created successfully! Redirecting to login...');
         setTimeout(() => navigate('/login'), 1500);
       } else {
-        setMessage(result.message || 'Signup failed. Please try again.');
+        toast.error(result.message || 'Signup failed. Please try again.');
       }
       setLoading(false);
     } else {
@@ -106,6 +112,16 @@ const SignupPage = () => {
               <UserPlus size={32} />
               <h2>Create Account</h2>
               <p>Sign up to start generating code</p>
+            </div>
+
+            <div className="test-credentials-banner">
+              <div className="test-credentials-content">
+                <strong>🔑 Test Credentials:</strong>
+                <div className="credentials-list">
+                  <span>Email: demo@gmail.com</span>
+                  <span>Password: Demo@123</span>
+                </div>
+              </div>
             </div>
 
             <form onSubmit={handleSubmit} className="auth-form">
@@ -176,12 +192,6 @@ const SignupPage = () => {
                 />
                 {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
               </div>
-
-              {message && (
-                <div className={`message ${message.includes('success') ? 'success' : 'error'}`}>
-                  {message}
-                </div>
-              )}
 
               <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
                 {loading ? 'Creating Account...' : (

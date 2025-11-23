@@ -23,25 +23,37 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await api.post('/logIn', { email, password });
-      if (response.data.status !== false) {
+      
+      // Check if response indicates success
+      if (response.data.status !== false && response.data.status) {
         setUser({ isAuthenticated: true });
         return { success: true };
       }
-      return { success: false, message: response.data.msg };
+      
+      // Handle explicit failure response
+      return { success: false, message: response.data.msg || 'Invalid credentials' };
     } catch (error) {
-      return { success: false, message: error.response?.data?.msg || 'Login failed' };
+      // Handle network errors or HTTP error statuses (401, 404, etc.)
+      const errorMessage = error.response?.data?.msg || error.message || 'Login failed';
+      return { success: false, message: errorMessage };
     }
   };
 
   const signup = async (name, email, password) => {
     try {
       const response = await api.post('/signUp', { name, email, password });
+      
+      // Check if user was created successfully
       if (response.data.user) {
         return { success: true };
       }
-      return { success: false, message: response.data.msg };
+      
+      // Handle failure response
+      return { success: false, message: response.data.msg || 'Signup failed' };
     } catch (error) {
-      return { success: false, message: error.response?.data?.msg || 'Signup failed' };
+      // Handle network errors or HTTP error statuses
+      const errorMessage = error.response?.data?.msg || error.message || 'Signup failed';
+      return { success: false, message: errorMessage };
     }
   };
 

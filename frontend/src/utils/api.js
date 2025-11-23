@@ -22,9 +22,14 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Only redirect to login if unauthorized AND we're on a protected route
+    // Don't redirect if we're already on login/signup pages
     if (error.response?.status === 401) {
-      // Redirect to login on unauthorized
-      window.location.href = '/login';
+      const currentPath = window.location.pathname;
+      // Only redirect if not already on auth pages
+      if (currentPath !== '/login' && currentPath !== '/signup' && currentPath !== '/') {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

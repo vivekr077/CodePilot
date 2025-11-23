@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Send, Copy, Check, History, LogOut, Code2, Loader, Sparkles } from 'lucide-react';
+import toast from 'react-hot-toast';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -14,7 +15,6 @@ const GeneratorPage = () => {
   const [generatedCode, setGeneratedCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [error, setError] = useState('');
 
   const languages = [
     { value: 'javascript', label: 'JavaScript', icon: '🟨' },
@@ -25,12 +25,11 @@ const GeneratorPage = () => {
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
-      setError('Please enter a prompt');
+      toast.error('Please enter a prompt');
       return;
     }
 
     setLoading(true);
-    setError('');
     setGeneratedCode('');
 
     try {
@@ -42,11 +41,12 @@ const GeneratorPage = () => {
       if (response.data.response) {
         setGeneratedCode(response.data.response);
         setPrompt('');
+        toast.success('Code generated successfully!');
       } else {
-        setError('Failed to generate code. Please try again.');
+        toast.error('Failed to generate code. Please try again.');
       }
     } catch (err) {
-      setError(err.response?.data?.msg || 'An error occurred while generating code');
+      toast.error(err.response?.data?.msg || 'An error occurred while generating code');
     } finally {
       setLoading(false);
     }
@@ -56,9 +56,10 @@ const GeneratorPage = () => {
     try {
       await navigator.clipboard.writeText(generatedCode);
       setCopied(true);
+      toast.success('Code copied to clipboard!');
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy:', err);
+      toast.error('Failed to copy code');
     }
   };
 
@@ -158,12 +159,6 @@ const GeneratorPage = () => {
                 </button>
               </div>
             </div>
-
-            {error && (
-              <div className="error-banner">
-                {error}
-              </div>
-            )}
           </div>
         </div>
 

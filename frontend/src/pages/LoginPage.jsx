@@ -1,18 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { LogIn, Mail, Lock, ArrowRight, Code2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user?.isAuthenticated) {
+      navigate('/generator');
+    }
+  }, [user, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,15 +51,14 @@ const LoginPage = () => {
 
     if (Object.keys(newErrors).length === 0) {
       setLoading(true);
-      setMessage('');
       
       const result = await login(formData.email, formData.password);
       
       if (result.success) {
-        setMessage('Login successful! Redirecting...');
+        toast.success('Login successful! Redirecting...');
         setTimeout(() => navigate('/generator'), 1000);
       } else {
-        setMessage(result.message || 'Login failed. Please check your credentials.');
+        toast.error(result.message || 'Login failed. Please check your credentials.');
       }
       setLoading(false);
     } else {
@@ -95,6 +101,16 @@ const LoginPage = () => {
               <p>Welcome back! Please enter your details</p>
             </div>
 
+            <div className="test-credentials-banner">
+              <div className="test-credentials-content">
+                <strong>🔑 Test Credentials:</strong>
+                <div className="credentials-list">
+                  <span>Email: demo@gmail.com</span>
+                  <span>Password: Demo@123</span>
+                </div>
+              </div>
+            </div>
+
             <form onSubmit={handleSubmit} className="auth-form">
               <div className="form-group">
                 <label htmlFor="email">
@@ -130,12 +146,6 @@ const LoginPage = () => {
                 />
                 {errors.password && <span className="error-message">{errors.password}</span>}
               </div>
-
-              {message && (
-                <div className={`message ${message.includes('success') ? 'success' : 'error'}`}>
-                  {message}
-                </div>
-              )}
 
               <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
                 {loading ? 'Signing In...' : (
