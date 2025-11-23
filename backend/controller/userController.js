@@ -4,17 +4,23 @@ import jwt from 'jsonwebtoken';
 
 
 export const createUserController = async (req, res) => {
+  console.log("hii");
    const { name, email, password } = req.body;
+   console.log(name, email, password);
+   
    if(!name || !email || !password){
       res.send("some field is missing")
    }
    const SALT = Number(process.env.SALT);
 
    try {
-      const hashedPassword = await bcrypt.hash(password, SALT)
+      console.log("holla");
+      const hashedPassword = await bcrypt.hash(password, SALT);
+      console.log("before prisma")
        const user = await prisma.user.create({
          data: {name, email, password: hashedPassword}
          });
+      console.log("after prisma")
        res.send({
           msg: "New User Created Successfully",
           user
@@ -61,8 +67,8 @@ export const loginController = async (req, res) => {
 
     res.cookie("authToken", token, {
        httpOnly: false,
-       secure: true, 
-       sameSite: "strict",
+       secure: false, 
+       sameSite: "lax",
        maxAge: 7 * 24 * 60 * 60 * 1000,
     })
       

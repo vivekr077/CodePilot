@@ -24,6 +24,22 @@ const model = genAI.getGenerativeModel({
     systemInstruction: systemInstruction 
 });
 
+// Helper function to remove code block markers
+const cleanCodeBlockMarkers = (code) => {
+  if (!code) return code;
+  
+  // Remove opening code fence (```language or just ```)
+  // This regex matches ```optionalLanguage at the start
+  let cleaned = code.replace(/^```\w*\n?/m, '');
+  
+  // Remove closing code fence (```)
+  // This matches ``` at the end, possibly with whitespace before it
+  cleaned = cleaned.replace(/\n?```\s*$/m, '');
+  
+  // Trim any extra whitespace
+  return cleaned.trim();
+};
+
 export const generateResponseByAi = async (prompt, language) => {
   try {
     // 4. Combine the specific Language and Request here
@@ -41,8 +57,11 @@ export const generateResponseByAi = async (prompt, language) => {
     // 6. Get text (This works now because we are using @google/generative-ai)
     const text = response.text();
     
-    // console.log("AI Response:", text); // Debugging
-    return text;
+    // 7. Clean the code block markers before returning
+    const cleanedCode = cleanCodeBlockMarkers(text);
+    
+    // console.log("AI Response:", cleanedCode); // Debugging
+    return cleanedCode;
 
   } catch (error) {
     console.error("AI Generation Error:", error);
