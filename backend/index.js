@@ -25,9 +25,10 @@ const setupAndStartServer = async() => {
       app.use(express.urlencoded());
       app.use(cookieParser());
       app.use(cors({
-            origin: "http://localhost:5173",
-            credentials: true,
+      origin: (origin, callback) => callback(null, true),
+      credentials: true
       }));
+
 
 
       app.use('/api/v1', userRoute);
