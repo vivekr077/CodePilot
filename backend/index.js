@@ -29,7 +29,9 @@ const setupAndStartServer = async() => {
       credentials: true
       }));
 
-
+      app.get('/health', (req, res) => {
+         res.status(200).json({ status: 'ok', message: 'Server is awake' });
+      });
 
       app.use('/api/v1', userRoute);
       app.use('/api/v1', codeRoute);

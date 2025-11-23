@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -11,6 +12,37 @@ import HistoryPage from './pages/HistoryPage';
 import './App.css';
 
 function App() {
+
+  useEffect(() => {
+    const wakeUpBackend = async () => {
+      try {
+        const backendUrl = import.meta.env.VITE_API_BASE_URL || 'https://codecopilotbackend.onrender.com/api/v1';
+        const healthUrl = backendUrl.replace('/api/v1', '/health');
+        
+        console.log('Waking up backend server...');
+        console.log('Backend URL:', healthUrl);
+        
+        await fetch(healthUrl, { 
+          method: 'GET',
+        })
+        .then(response => {
+          if (response.ok) {
+            console.log('Backend is awake and ready!');
+          } else {
+            console.log('Backend responded but might be warming up...');
+          }
+        })
+        .catch(() => {
+          console.log('Wake-up signal sent to backend (CORS limited response)');
+        });
+      } catch (error) {
+        console.log('Backend wake-up ping attempted');
+      }
+    };
+
+    wakeUpBackend();
+  }, []);
+
   return (
     <ThemeProvider>
       <AuthProvider>
