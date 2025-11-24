@@ -66,9 +66,9 @@ export const loginController = async (req, res) => {
       JWT_KEY,{ expiresIn: "7d"});
 
     res.cookie("authToken", token, {
-       httpOnly: false,
+       httpOnly: true,
        secure: false, 
-       sameSite: "lax",
+       sameSite: "none",
        maxAge: 7 * 24 * 60 * 60 * 1000,
     })
       
@@ -86,12 +86,4 @@ export const loginController = async (req, res) => {
     });
   }
 };
-
-// export const logoutController = async (req, res) => {
-//     try {
-      
-//     } catch (error) {
-      
-//     }
-// }
 
