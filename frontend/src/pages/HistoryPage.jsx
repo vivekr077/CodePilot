@@ -13,7 +13,9 @@ import {
   Calendar,
   FileCode,
   ArrowLeft,
-  Loader
+  Loader,
+  Menu,
+  X
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
@@ -29,6 +31,7 @@ const HistoryPage = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [expandedId, setExpandedId] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -104,7 +107,9 @@ const HistoryPage = () => {
           <Code2 size={28} />
           <span>CodeCopilot</span>
         </div>
-        <div className="nav-actions">
+        
+        {/* Desktop Navigation */}
+        <div className="nav-actions desktop-nav">
           <button 
             className="btn btn-secondary"
             onClick={() => navigate('/generator')}
@@ -120,7 +125,42 @@ const HistoryPage = () => {
             Logout
           </button>
         </div>
+
+        {/* Mobile Menu Toggle */}
+        <button 
+          className="mobile-menu-toggle"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle menu"
+        >
+          {menuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </nav>
+
+      {/* Mobile Navigation Menu */}
+      {menuOpen && (
+        <div className="mobile-nav-menu">
+          <button 
+            className="btn btn-secondary mobile-nav-btn"
+            onClick={() => {
+              navigate('/generator');
+              setMenuOpen(false);
+            }}
+          >
+            <ArrowLeft size={18} />
+            Generator
+          </button>
+          <button 
+            className="btn btn-ghost mobile-nav-btn"
+            onClick={() => {
+              handleLogout();
+              setMenuOpen(false);
+            }}
+          >
+            <LogOut size={18} />
+            Logout
+          </button>
+        </div>
+      )}
 
       <div className="history-container">
         <div className="history-header">

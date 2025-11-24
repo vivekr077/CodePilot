@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Send, Copy, Check, History, LogOut, Code2, Loader, Sparkles } from 'lucide-react';
+import { Send, Copy, Check, History, LogOut, Code2, Loader, Sparkles, Menu, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
@@ -15,6 +15,7 @@ const GeneratorPage = () => {
   const [generatedCode, setGeneratedCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const languages = [
     { value: 'javascript', label: 'JavaScript', icon: '🟨' },
@@ -82,7 +83,9 @@ const GeneratorPage = () => {
           <Code2 size={28} />
           <span>CodeCopilot</span>
         </div>
-        <div className="nav-actions">
+        
+        {/* Desktop Navigation */}
+        <div className="nav-actions desktop-nav">
           <button 
             className="btn btn-secondary"
             onClick={() => navigate('/history')}
@@ -98,7 +101,42 @@ const GeneratorPage = () => {
             Logout
           </button>
         </div>
+
+        {/* Mobile Menu Toggle */}
+        <button 
+          className="mobile-menu-toggle"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle menu"
+        >
+          {menuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </nav>
+
+      {/* Mobile Navigation Menu */}
+      {menuOpen && (
+        <div className="mobile-nav-menu">
+          <button 
+            className="btn btn-secondary mobile-nav-btn"
+            onClick={() => {
+              navigate('/history');
+              setMenuOpen(false);
+            }}
+          >
+            <History size={18} />
+            History
+          </button>
+          <button 
+            className="btn btn-ghost mobile-nav-btn"
+            onClick={() => {
+              handleLogout();
+              setMenuOpen(false);
+            }}
+          >
+            <LogOut size={18} />
+            Logout
+          </button>
+        </div>
+      )}
 
       <div className="generator-container">
         {/* Input Section */}
